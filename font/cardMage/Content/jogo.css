@@ -1,0 +1,17 @@
+﻿#gallery { float: left; width: 20%; min-height: 12em; } * html #gallery { height: 12em; } /* IE6 */
+.gallery.custom-state-active { background: #eee; }
+.gallery li { float: left; width: 96px; padding: 0.4em; margin: 0 0.4em 0.4em 0; text-align: center; }
+.gallery li h5 { margin: 0 0 0.4em; cursor: move; }
+.gallery li a { float: right; }
+.gallery li a.ui-icon-zoomin { float: left; }
+.gallery li img { width: 100%; cursor: move; }
+
+#mytrash { float: right; width: 32%; min-height: 18em; padding: 1%;} * html #mytrash { height: 18em; } /* IE6 */
+#mytrash h4 { line-height: 16px; margin: 0 0 0.4em; }
+#mytrash h4 .ui-icon { float: left; }
+#mytrash .gallery h5 { display: none; }
+
+#myhand { float: left; width: 32%; min-height: 18em; padding: 1%;} * html #myhand { height: 18em; } /* IE6 */
+#myhand h4 { line-height: 16px; margin: 0 0 0.4em; }
+#myhand h4 .ui-icon { float: left; }
+#myhand .gallery h5 { display: none; }

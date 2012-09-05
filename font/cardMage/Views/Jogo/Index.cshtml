@@ -1,0 +1,39 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<meta charset="utf-8">
+
+<div class="demo-description">
+    <h2>
+        Bem vindo ao jogo.</h2>
+</div>
+<div class="demo ui-widget ui-helper-clearfix">
+    <ul id="gallery" class="gallery ui-helper-reset ui-helper-clearfix">
+        <li id="carta1" class="ui-widget-content ui-corner-tr">
+            <h5 class="ui-widget-header">
+                High Tatras</h5>
+            <img src="../../Images/Cartas/blackhero.jpg" alt="The peaks of High Tatras" width="96"
+                height="72" />
+            <a href="../../Images/Cartas/blackhero.jpg" title="View larger image" class="ui-icon ui-icon-zoomin">
+                View larger</a> </li>
+    </ul>
+    <div id="myhand" class="ui-widget-content ui-state-default">
+        <h4 class="ui-widget-header">&nbsp;Hand</h4>
+    </div>
+    <div id="mytrash" class="ui-widget-content ui-state-default">
+        <h4 class="ui-widget-header">&nbsp;Trash</h4>
+    </div>
+</div>
+<div id="cartaDialog" title="Carta">
+    <img id="imagemCarta" src="" alt="" />
+</div>
+@section Scripts {
+    @Styles.Render("~/Content/themes/base/css")
+    @Scripts.Render("~/bundles/jogo")
+    <script type="text/javascript">
+        
+
+        
+    </script>
+}
