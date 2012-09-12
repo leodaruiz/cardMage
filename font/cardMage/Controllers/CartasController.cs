@@ -9,8 +9,10 @@ using cardMage.Models;
 
 namespace cardMage.Controllers
 {
+
     public class CartasController : Controller
     {
+
         private MainContext db = new MainContext();
 
         //
@@ -41,7 +43,7 @@ namespace cardMage.Controllers
 
         public ActionResult Create()
         {
-            ViewBag.TipoCartaID = new SelectList( db.TiposCarta, "Id", "Tipo");
+            ViewBag.TipoCartaID = new SelectList(db.TiposCarta, "Id", "Tipo");
             return View();
         }
 
