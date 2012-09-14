@@ -2,10 +2,12 @@
 
 namespace cardMage.Models
 {
-    public class TipoCarta
+    public enum TipoCarta
     {
-        public ObjectId Id { get; set; }
-
-        public string Tipo { get; set; }
+        Heroi,
+        Terreno,
+        Criatura,
+        Magica,
+        Encantamento
     }
 }

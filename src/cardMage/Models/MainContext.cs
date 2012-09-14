@@ -1,59 +1,124 @@
 ﻿using System.Data.Entity;
 using MongoDB.Driver;
+using MongoDB.Bson;
+using MongoDB.Driver.Linq;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace cardMage.Models
 {
+    public class DatabaseVersion
+    {
+        public ObjectId Id { get; set; }
+        public string Nome { get; set; }
+    }
+
     public class MainContext
     {
-        public DbSet<UserProfile> UserProfiles { get; set; }
+        public MongoCollection<UserProfile> UserProfiles { get; set; }
         public MongoCollection<Carta> Cartas { get; set; }
-        public MongoCollection<TipoCarta> TiposCarta { get; set; }
         public MongoCollection<Baralho> Baralhos { get; set; }
 
-        public TipoCarta terreno = new TipoCarta() { Tipo = "Terreno" };
-        public TipoCarta heroi = new TipoCarta() { Tipo = "Herói" };
-        public TipoCarta criatura = new TipoCarta() { Tipo = "Criatura" };
-        public TipoCarta magica = new TipoCarta() { Tipo = "Mágica" };
-        public TipoCarta encantamento = new TipoCarta() { Tipo = "Encantamento" };
+        private MongoDatabase database;
 
         public MainContext()
         {
             var connectionString = "mongodb://localhost/?safe=true";
             var server = MongoServer.Create(connectionString);
-            var database = server.GetDatabase("cardMage");
+            database = server.GetDatabase("cardMage");
 
             Cartas = database.GetCollection<Carta>("cartas");
-            TiposCarta = database.GetCollection<TipoCarta>("tiposcarta");
             Baralhos = database.GetCollection<Baralho>("baralhos");
+            UserProfiles = database.GetCollection<UserProfile>("usuarios");
+
+            if (Cartas.Count() <= 0)
+            {
+                Baralhos.RemoveAll();
+                Cartas.RemoveAll();
+                UserProfiles.RemoveAll();
+                Seed();
+
+            }
         }
 
         public void Seed()
         {
-            this.UserProfiles.AddOrUpdate(new UserProfile() { UserId = 1, UserName = "aprendiz01" });
+            SeedUsuarios();
+            SeedCartas();
+            SeedBaralhos();
+        }
 
+        private void SeedUsuarios()
+        {
+            this.UserProfiles.Insert(new UserProfile() { UserId = 1, UserName = "aprendiz01" });
+        }
 
-            this.TiposCarta.Insert(terreno);
-            this.TiposCarta.Insert(heroi);
-            this.TiposCarta.Insert(criatura);
-            this.TiposCarta.Insert(magica);
-            this.TiposCarta.Insert(encantamento);
-            
+        private void SeedCartas()
+        {
             Mana zero = new Mana();
             Mana p2 = new Mana() { Preta = 2 };
             Mana p1 = new Mana() { Preta = 1 };
             Mana b2 = new Mana() { Branca = 2 };
             Mana b1 = new Mana() { Branca = 1 };
 
-            this.Cartas.AddOrUpdate(
-              new Carta { Id = "T01", Nome = "Pântano", TipoCartaID = context.terreno.Id, Imagem = "pantano.jpg", Custo = zero },
-              new Carta { Id = "T02", Nome = "Planície", TipoCartaID = context.terreno.Id, Imagem = "planicie.jpg", Custo = zero },
-              new Carta { Id = "H01", Nome = "Shadow Master", TipoCartaID = context.heroi.Id, Imagem = "blackhero.jpg", Ataque = 0, Defesa = 20, Custo = zero },
-              new Carta { Id = "H02", Nome = "Light Lord", TipoCartaID = context.heroi.Id, Imagem = "whitehero.jpg", Ataque = 0, Defesa = 20, Custo = zero },
-              new Carta { Id = "C01", Nome = "Black Knight", TipoCartaID = context.criatura.Id, Imagem = "whitehero.jpg", Ataque = 2, Defesa = 2, Custo = p2 },
-              new Carta { Id = "C02", Nome = "Dark Rider", TipoCartaID = context.criatura.Id, Imagem = "whitehero.jpg", Ataque = 2, Defesa = 1, Custo = p1 },
-              new Carta { Id = "C03", Nome = "White Knight", TipoCartaID = context.criatura.Id, Imagem = "whitehero.jpg", Ataque = 2, Defesa = 2, Custo = b2 },
-              new Carta { Id = "C04", Nome = "White Soldier", TipoCartaID = context.criatura.Id, Imagem = "whitehero.jpg", Ataque = 2, Defesa = 1, Custo = b1 }
-            );
+            this.Cartas.Insert(
+              new Carta { Codigo = "T01", Nome = "Pântano", TipoCarta = TipoCarta.Terreno, Imagem = "pantano.jpg", Custo = zero });
+            this.Cartas.Insert(
+              new Carta { Codigo = "T02", Nome = "Planície", TipoCarta = TipoCarta.Terreno, Imagem = "planicie.jpg", Custo = zero });
+            this.Cartas.Insert(
+              new Carta { Codigo = "H01", Nome = "Shadow Master", TipoCarta = TipoCarta.Heroi, Imagem = "blackhero.jpg", Ataque = 0, Defesa = 20, Custo = zero });
+            this.Cartas.Insert(
+              new Carta { Codigo = "H02", Nome = "Light Lord", TipoCarta = TipoCarta.Heroi, Imagem = "whitehero.jpg", Ataque = 0, Defesa = 20, Custo = zero });
+            this.Cartas.Insert(
+              new Carta { Codigo = "C01", Nome = "Black Knight", TipoCarta = TipoCarta.Criatura, Imagem = "whitehero.jpg", Ataque = 2, Defesa = 2, Custo = p2 });
+            this.Cartas.Insert(
+              new Carta { Codigo = "C02", Nome = "Dark Rider", TipoCarta = TipoCarta.Criatura, Imagem = "whitehero.jpg", Ataque = 2, Defesa = 1, Custo = p1 });
+            this.Cartas.Insert(
+              new Carta { Codigo = "C03", Nome = "White Knight", TipoCarta = TipoCarta.Criatura, Imagem = "whitehero.jpg", Ataque = 2, Defesa = 2, Custo = b2 });
+            this.Cartas.Insert(
+              new Carta { Codigo = "C04", Nome = "White Soldier", TipoCarta = TipoCarta.Criatura, Imagem = "whitehero.jpg", Ataque = 2, Defesa = 1, Custo = b1 });
+
+        }
+
+        private void SeedBaralhos()
+        {
+            Baralho b = new Baralho();
+            b.Nome = "Computador01";
+            b.HeroiId = "H01";
+            b.Cartas = new string[] { 
+                "T01", "T01", "T01", "T01", "T01", "T01", "T01", "T01", "T01", "T01", 
+                "T01", "T01", "T01", "T01", "T01", "T01", "T01", "T01", "T01", "T01", 
+                "C01", "C01", "C01", "C01", 
+                "C01", "C01", "C01", "C01", 
+                "C01", "C01", "C01", "C01", 
+                "C01", "C01", "C01", "C01", 
+                "C01", "C01", "C01", "C01", 
+                "C02", "C02", "C02", "C02",
+                "C02", "C02", "C02", "C02",
+                "C02", "C02", "C02", "C02",
+                "C02", "C02", "C02", "C02",
+                "C02", "C02", "C02", "C02" 
+            };
+            this.Baralhos.Insert(b);
+
+            b = new Baralho();
+            b.Nome = "Usuario01";
+            b.HeroiId = "H02";
+            b.Cartas = new string[] { 
+                "T02", "T02", "T02", "T02", "T02", "T02", "T02", "T02", "T02", "T02", 
+                "T02", "T02", "T02", "T02", "T02", "T02", "T02", "T02", "T02", "T02", 
+                "C03", "C03", "C03", "C03", 
+                "C03", "C03", "C03", "C03", 
+                "C03", "C03", "C03", "C03", 
+                "C03", "C03", "C03", "C03", 
+                "C03", "C03", "C03", "C03", 
+                "C04", "C04", "C04", "C04", 
+                "C04", "C04", "C04", "C04", 
+                "C04", "C04", "C04", "C04", 
+                "C04", "C04", "C04", "C04", 
+                "C04", "C04", "C04", "C04"
+            };
+            this.Baralhos.Insert(b);
         }
     }
 }

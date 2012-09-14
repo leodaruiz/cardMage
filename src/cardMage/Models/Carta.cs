@@ -1,14 +1,26 @@
 ﻿using MongoDB.Bson;
+using System.ComponentModel.DataAnnotations;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace cardMage.Models
 {
     public class Carta
     {
-        public ObjectId Id { get; set; }
+        [BsonId]
+        public ObjectId ObjectId;
+
+        [ScaffoldColumn(false)]
+        public string Id
+        {
+            get { return ObjectId.ToString(); }
+            set { ObjectId = new ObjectId(value); }
+        }
+
+        public string Codigo { get; set; }
 
         public string Nome { get; set; }
 
-        public int TipoCartaID { get; set; }
+        public TipoCarta TipoCarta { get; set; }
 
         public string Descricao { get; set; }
 

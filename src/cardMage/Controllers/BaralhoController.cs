@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using cardMage.Models;
+using MongoDB.Driver.Linq;
 
 namespace cardMage.Controllers
 {
@@ -16,7 +17,7 @@ namespace cardMage.Controllers
 
         public ActionResult Index()
         {
-            return View(db.Baralhos.ToList());
+            return View(db.Baralhos.AsQueryable<Baralho>().ToList());
         }
 
         //
@@ -24,8 +25,8 @@ namespace cardMage.Controllers
 
         public ActionResult Details(string nome)
         {
-            Baralho b = db.Baralhos.Find(nome);
-            if(b==null  ) 
+            Baralho b = db.Baralhos.AsQueryable<Baralho>().First(x => x.Nome == nome);
+            if (b == null)
             {
                 return HttpNotFound();
             }
@@ -37,7 +38,7 @@ namespace cardMage.Controllers
 
         public ActionResult Create()
         {
-            ViewBag.HeroiID = new SelectList(db.Cartas.Where(x => x.TipoCartaID == db.heroi.Id), "Id", "Nome");
+            //ViewBag.HeroiID = new SelectList(db.Cartas.Where(x => x.TipoCartaID == db.heroi.Id), "Id", "Nome");
             return View();
         }
 

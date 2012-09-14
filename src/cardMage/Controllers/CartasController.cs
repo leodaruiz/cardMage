@@ -6,6 +6,9 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using cardMage.Models;
+using MongoDB.Driver.Linq;
+using MongoDB.Bson;
+using MongoDB.Driver.Builders;
 
 namespace cardMage.Controllers
 {
@@ -15,26 +18,32 @@ namespace cardMage.Controllers
 
         private MainContext db = new MainContext();
 
+        private Carta getCarta(string id)
+        {
+            Carta carta = db.Cartas.AsQueryable<Carta>().First(e => e.Id == id);
+            return carta;
+        }
+
         //
         // GET: /Cartas/
 
         public ActionResult Index()
         {
-            return View(db.Cartas.ToList());
+            return View(db.Cartas.AsQueryable<Carta>().ToList());
         }
 
         //
         // GET: /Cartas/Details/5
 
-        public ActionResult Details(int id = 0)
+        public ActionResult Details(string id = "")
         {
-            Carta carta = db.Cartas.Find(id);
+            Carta carta = getCarta(id);
             if (carta == null)
             {
                 return HttpNotFound();
             }
 
-            ViewBag.TipoCartaID = new SelectList(db.TiposCarta, "Id", "Tipo");
+            //ViewBag.TipoCartaID = new SelectList(db.TiposCarta, "Id", "Tipo");
             return View(carta);
         }
 
@@ -43,7 +52,6 @@ namespace cardMage.Controllers
 
         public ActionResult Create()
         {
-            ViewBag.TipoCartaID = new SelectList(db.TiposCarta, "Id", "Tipo");
             return View();
         }
 
@@ -55,8 +63,7 @@ namespace cardMage.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Cartas.Add(carta);
-                db.SaveChanges();
+                db.Cartas.Insert(carta);
                 return RedirectToAction("Index");
             }
 
@@ -68,13 +75,11 @@ namespace cardMage.Controllers
 
         public ActionResult Edit(string id = "")
         {
-            Carta carta = db.Cartas.Find(id);
+            Carta carta = getCarta(id);
             if (carta == null)
             {
                 return HttpNotFound();
             }
-
-            ViewBag.TipoCartaID = new SelectList(db.TiposCarta, "Id", "Tipo");
             return View(carta);
         }
 
@@ -86,8 +91,7 @@ namespace cardMage.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(carta).State = EntityState.Modified;
-                db.SaveChanges();
+                db.Cartas.Save(carta);
                 return RedirectToAction("Index");
             }
             return View(carta);
@@ -98,7 +102,7 @@ namespace cardMage.Controllers
 
         public ActionResult Delete(string id = "")
         {
-            Carta carta = db.Cartas.Find(id);
+            Carta carta = getCarta(id);
             if (carta == null)
             {
                 return HttpNotFound();
@@ -112,16 +116,11 @@ namespace cardMage.Controllers
         [HttpPost, ActionName("Delete")]
         public ActionResult DeleteConfirmed(string id)
         {
-            Carta carta = db.Cartas.Find(id);
-            db.Cartas.Remove(carta);
-            db.SaveChanges();
-            return RedirectToAction("Index");
-        }
+            Carta carta = getCarta(id);
 
-        protected override void Dispose(bool disposing)
-        {
-            db.Dispose();
-            base.Dispose(disposing);
+            db.Cartas.Remove(Query.EQ("_id", id));
+
+            return RedirectToAction("Index");
         }
     }
 }
